@@ -1,0 +1,17 @@
+{
+  "sections": {
+    "pl_shared": {
+      "save_amount_html": "Save {{ amount }}",
+      "percent_off_html": "{{ percent }}% off",
+      "add_to_cart": "Add to cart",
+      "sold_out": "Sold out",
+      "view_product": "View {{ product_title }}",
+      "reviews_count": "{{ count }} reviews",
+      "shop_bundle": "Shop bundle",
+      "build_this_box": "Build this box",
+      "product_promises": "Product promises",
+      "customer_reviews": "Customer reviews",
+      "no_reviews_yet": "Be the first to review"
+    }
+  }
+}
