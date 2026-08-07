@@ -74,12 +74,38 @@ box photography would replace this gap if/when available.
   Foaming Kitchen Cleaner → "Best seller", Copper/Bronze/Brass Cleaner →
   "Top rated", Washing Machine Cleaner & Descaler → "New".
 
-## Still needed on the store (not done by this pass)
+## Theme install (this pass)
 
-- Theme code (`sections/`, `snippets/`, `assets/`, `locales/` fragment)
-  is NOT yet installed on the theme — Shopify CLI is not available in
-  this environment (no npm/npx/yarn/pnpm to install it with). Needs
-  Shopify CLI or the admin code editor, once available.
-- Section blocks (hero slides, combo/tier product references, review
-  blocks) aren't wired up yet — that happens in the theme editor once
-  the code is installed, pointing blocks at the products above.
+- Dawn v15.5.0 pulled clean from GitHub, sections/snippets/assets copied
+  in, `locales/en.default.json`'s `pl_shared` block merged into Dawn's
+  real locale file, and the CSS/font/JS include added to
+  `layout/theme.liquid` per `config/theme-liquid-snippet.txt`.
+- `shopify theme check` surfaced 3 real issues, fixed (see git log on
+  `sections/*.liquid`): `{% doc %}` isn't valid at section top-level
+  (only snippets/blocks) so it's `{% comment %}` there instead; two
+  `render` calls in `shop-product-grid.liquid` piped a filter directly
+  onto a render-tag argument, which Liquid doesn't allow — fixed by
+  assigning the filtered string first. Re-run is clean: 0 errors/warnings
+  on anything in this build.
+- Pushed to the dev store as a new unpublished theme (id
+  `148177846332`, name "Purelane Sections Dev") — not published live.
+- `templates/index.json` (in the theme, not this repo — it's
+  install-specific) has all 5 sections added to the homepage in order,
+  with blocks wired to the real products/reviews above: hero slides
+  reference 3 real bestsellers' label/price/compare-at (hero uses
+  image_picker for its own art, not `product.featured_image`, by
+  design — see NOTES.md); shop grid pins all 8 shop-grid products
+  including the 3 required edge cases; combos/tiers reference the 6
+  backing products; reviews reference the 5 `review_card` metaobjects.
+- **Not verified live**: the storefront is password-protected and the
+  password provided didn't authenticate (checked via both `shopify
+  theme dev --store-password` and a direct POST to `/password`) — no
+  screenshot or rendered-HTML check has been done. The 3 edge cases were
+  traced through the Liquid/CSS instead (see `snippets/pl-product-card.liquid`
+  and `assets/purelane-sections.css`): sold-out sets `product.available
+  == false`, which shows a "Sold out" pill + disabled button and
+  correctly suppresses any `badge_label` override; no-image falls back
+  to the `bottle-placeholder` icon since `product.featured_image` is
+  blank; long-title is clamped to 2 lines via `-webkit-line-clamp:2` on
+  `.pl-card h3`. This is a code-level check, not a rendered one — still
+  needs an actual look once storefront access is sorted.
