@@ -1,10 +1,10 @@
-{%- doc -%}
+{%- comment -%}
   #shop — "Bestsellers" product grid.
   Source file hardcoded 8 <article> cards, half using CSS background-image
   sprites and half using inline duplicate-of-the-same-product SVGs, with
   every price/rating/title hand typed. Here the merchant picks a collection
   (or individual products) and every card renders from real product data.
-{%- enddoc -%}
+{%- endcomment -%}
 
 <section class="pl-scope pl-sec" id="{{ section.id }}" data-pl-section aria-labelledby="pl-shop-heading-{{ section.id }}">
   <div class="pl-wrap">
@@ -20,7 +20,8 @@
       {%- if section.settings.collection != blank -%}
         {%- for product in section.settings.collection.products limit: section.settings.product_limit -%}
           {%- assign stagger = forloop.index0 | modulo: 4 -%}
-          {%- render 'pl-product-card', product: product, card_class: 'pl-rv-d' | append: stagger -%}
+          {%- assign stagger_class = 'pl-rv-d' | append: stagger -%}
+          {%- render 'pl-product-card', product: product, card_class: stagger_class -%}
         {%- endfor -%}
       {%- endif -%}
 
@@ -31,7 +32,8 @@
       {%- for block in section.blocks -%}
         {%- if block.type == 'product' and block.settings.product != blank -%}
           {%- assign stagger = forloop.index0 | modulo: 4 -%}
-          {%- render 'pl-product-card', product: block.settings.product, badge_text: block.settings.badge_override, card_class: 'pl-rv-d' | append: stagger -%}
+          {%- assign stagger_class = 'pl-rv-d' | append: stagger -%}
+          {%- render 'pl-product-card', product: block.settings.product, badge_text: block.settings.badge_override, card_class: stagger_class -%}
         {%- endif -%}
       {%- endfor -%}
     </div>

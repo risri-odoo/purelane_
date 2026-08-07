@@ -1,4 +1,4 @@
-{%- doc -%}
+{%- comment -%}
   #reviews — auto-scrolling marquee of customer reviews.
   Source file hand-typed 5 reviews then duplicated the same 5 a second time
   in the markup to make the CSS marquee loop seamlessly (10 <article>s for
@@ -7,7 +7,7 @@
   render time only when there are enough entries for a loop to look
   intentional, and falls back to a static swipeable row otherwise so 1-2
   reviews never produces a visibly broken loop.
-{%- enddoc -%}
+{%- endcomment -%}
 
 <section class="pl-scope pl-sec pl-revband" id="{{ section.id }}" data-pl-section aria-labelledby="pl-reviews-heading-{{ section.id }}">
   <div class="pl-wrap">
@@ -28,7 +28,6 @@
 
   {%- liquid
     assign review_blocks = section.blocks | where: 'type', 'review'
-    assign valid_reviews = ''
     assign review_count = 0
     for block in review_blocks
       if block.settings.review != blank
