@@ -1,0 +1,27 @@
+{%- comment -%}
+  Renders one review from a `review_card` metaobject entry.
+  No native Shopify review object exists, so this is modelled as a
+  metaobject (definition in /config/metaobjects.json) rather than baking
+  review copy into section settings — that keeps reviews reorderable,
+  reusable across sections (e.g. a future PDP reviews block) and bulk-
+  editable from Content > Metaobjects instead of buried in this section's
+  block list. If the store later installs a reviews app, this snippet is
+  the only file that needs to change.
+
+  Params:
+    review: required, metaobject of type 'review_card'
+{%- endcomment -%}
+{%- liquid
+  assign stars = review.rating.value | default: 5
+-%}
+<article class="pl-glass-2 pl-rcard">
+  <div class="pl-st" aria-hidden="true">{% for i in (1..5) %}{% if i <= stars %}★{% else %}☆{% endif %}{% endfor %}</div>
+  <span class="visually-hidden">Rated {{ stars }} out of 5 stars</span>
+  <h3>{{ review.title.value }}</h3>
+  <p>{{ review.body.value }}</p>
+  <div class="pl-who">
+    {%- render 'pl-icon', icon: 'check' -%}
+    <b>{{ review.author_name.value }}</b>
+    {%- if review.author_context.value != blank -%}<span>· {{ review.author_context.value }}</span>{%- endif -%}
+  </div>
+</article>

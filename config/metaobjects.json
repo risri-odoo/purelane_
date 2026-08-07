@@ -1,0 +1,18 @@
+{
+  "note": "Shopify has no metaobject-definition-as-code import in the theme itself — these must be created once in Admin (Settings > Custom data > Metaobjects) or via the Admin GraphQL API (metaobjectDefinitionCreate). This file documents exactly what was created on the dev store so it's reproducible.",
+  "metaobjectDefinitions": [
+    {
+      "type": "review_card",
+      "name": "Review card",
+      "displayNameKey": "title",
+      "access": { "storefront": "public_read" },
+      "fieldDefinitions": [
+        { "key": "rating", "name": "Rating", "type": "number_integer", "required": true, "validations": [{ "name": "min", "value": "1" }, { "name": "max", "value": "5" }] },
+        { "key": "title", "name": "Title", "type": "single_line_text_field", "required": true },
+        { "key": "body", "name": "Review body", "type": "multi_line_text_field", "required": true },
+        { "key": "author_name", "name": "Author name", "type": "single_line_text_field", "required": true },
+        { "key": "author_context", "name": "Author context", "type": "single_line_text_field", "required": false, "description": "e.g. 'Laundry detergent' — what they reviewed" }
+      ]
+    }
+  ]
+}

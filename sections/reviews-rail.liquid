@@ -1,0 +1,94 @@
+{%- doc -%}
+  #reviews — auto-scrolling marquee of customer reviews.
+  Source file hand-typed 5 reviews then duplicated the same 5 a second time
+  in the markup to make the CSS marquee loop seamlessly (10 <article>s for
+  5 reviews). Here a merchant manages N reviews once, as blocks each
+  pointing at a review_card metaobject; the template duplicates the set at
+  render time only when there are enough entries for a loop to look
+  intentional, and falls back to a static swipeable row otherwise so 1-2
+  reviews never produces a visibly broken loop.
+{%- enddoc -%}
+
+<section class="pl-scope pl-sec pl-revband" id="{{ section.id }}" data-pl-section aria-labelledby="pl-reviews-heading-{{ section.id }}">
+  <div class="pl-wrap">
+    <div class="pl-revhead pl-rv">
+      <h2 class="visually-hidden" id="pl-reviews-heading-{{ section.id }}">{{ 'sections.pl_shared.customer_reviews' | t }}</h2>
+      {%- if section.settings.kicker != blank -%}<span class="pl-kicker">{{ section.settings.kicker }}</span>{%- endif -%}
+      {%- if section.settings.aggregate_rating != blank -%}
+        <span class="pl-agg">
+          <span class="pl-st" aria-hidden="true">★★★★★</span>
+          <b>{{ section.settings.aggregate_rating }}</b> from {{ section.settings.review_count_label }}
+        </span>
+      {%- endif -%}
+      {%- if section.settings.homes_label != blank -%}
+        <span class="pl-agg">Loved by <b>{{ section.settings.homes_label }}</b></span>
+      {%- endif -%}
+    </div>
+  </div>
+
+  {%- liquid
+    assign review_blocks = section.blocks | where: 'type', 'review'
+    assign valid_reviews = ''
+    assign review_count = 0
+    for block in review_blocks
+      if block.settings.review != blank
+        assign review_count = review_count | plus: 1
+      endif
+    endfor
+    assign loop_enough = false
+    if review_count >= 4
+      assign loop_enough = true
+    endif
+  -%}
+
+  {%- if review_count > 0 -%}
+    <div class="pl-revrail pl-rv{% unless loop_enough %} pl-revrail-static{% endunless %}" aria-label="{{ 'sections.pl_shared.customer_reviews' | t }}">
+      <div class="pl-revtrack" style="--pl-marq-duration: {{ section.settings.marquee_duration }}s;">
+        {%- for block in review_blocks -%}
+          {%- if block.settings.review != blank -%}
+            {%- render 'pl-review-card', review: block.settings.review -%}
+          {%- endif -%}
+        {%- endfor -%}
+        {%- if loop_enough -%}
+          {%- comment -%} Exact duplicate set, aria-hidden, so the -50% keyframe
+          lands on an identical seam and assistive tech only announces the
+          reviews once. {%- endcomment -%}
+          {%- for block in review_blocks -%}
+            {%- if block.settings.review != blank -%}
+              <div aria-hidden="true">{%- render 'pl-review-card', review: block.settings.review -%}</div>
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+    </div>
+  {%- else -%}
+    <p class="pl-body-s pl-wrap" style="text-align:center">{{ 'sections.pl_shared.no_reviews_yet' | t }}</p>
+  {%- endif -%}
+</section>
+
+{%- schema -%}
+{
+  "name": "Reviews rail",
+  "tag": "section",
+  "class": "pl-section-reviews",
+  "settings": [
+    { "type": "text", "id": "kicker", "label": "Kicker", "default": "That's what they said" },
+    { "type": "text", "id": "aggregate_rating", "label": "Aggregate rating", "default": "4.8" },
+    { "type": "text", "id": "review_count_label", "label": "Review count label", "default": "8,000+ reviews" },
+    { "type": "text", "id": "homes_label", "label": "Homes label", "default": "12 lakh+ homes" },
+    { "type": "range", "id": "marquee_duration", "label": "Scroll speed (seconds per loop, lower = faster)", "min": 20, "max": 90, "step": 2, "default": 52 }
+  ],
+  "blocks": [
+    {
+      "type": "review",
+      "name": "Review",
+      "settings": [
+        { "type": "metaobject", "id": "review", "label": "Review", "metaobject_type": "review_card" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Reviews rail", "blocks": [ { "type": "review" }, { "type": "review" }, { "type": "review" }, { "type": "review" } ] }
+  ]
+}
+{%- endschema -%}
