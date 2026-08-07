@@ -1,0 +1,62 @@
+{%- comment -%}
+  Purelane product card. Real Shopify data only: image, title, price,
+  compare_at_price and availability all come off `product`/`variant`.
+  Rating + review count use custom metafields since Dawn/Shopify have no
+  native review object — see /config/metafields.json. If the store later
+  installs a reviews app, swap the two metafield reads below for that
+  app's metafields (Judge.me, Loox, Yotpo all expose rating + count as
+  product metafields already, so this card's markup doesn't need to change).
+
+  Params:
+    product:    required, Shopify product object
+    badge_text: optional override; falls back to product.metafields.custom.badge_label
+    card_class: optional extra class, e.g. for stagger animation delay
+{%- endcomment -%}
+{%- liquid
+  assign variant = product.selected_or_first_available_variant
+  assign badge = badge_text | default: product.metafields.custom.badge_label.value
+  assign rating = product.metafields.reviews.rating.value.rating | default: product.metafields.custom.rating_value.value
+  assign rating_count = product.metafields.reviews.rating_count.value | default: product.metafields.custom.review_count.value
+  assign card_image = product.featured_image
+-%}
+<article class="pl-glass pl-card pl-rv {{ card_class }}">
+  <a href="{{ product.url | default: '#' }}" class="pl-shot{% if product.available == false %} pl-shot-soldout{% endif %}" aria-hidden="{% if card_image %}true{% else %}false{% endif %}" tabindex="-1">
+    {%- if product.available == false -%}
+      <span class="pl-pill pl-pill-sold">{{ 'sections.pl_shared.sold_out' | t }}</span>
+    {%- elsif badge -%}
+      <span class="pl-pill">{{ badge }}</span>
+    {%- endif -%}
+    {%- if card_image -%}
+      {{ card_image | image_url: width: 400 | image_tag:
+        loading: 'lazy',
+        widths: '160, 240, 320, 400',
+        sizes: '(min-width: 1024px) 260px, (min-width: 700px) 30vw, 45vw',
+        alt: card_image.alt | default: product.title
+      }}
+    {%- else -%}
+      {%- render 'pl-icon', icon: 'bottle-placeholder' -%}
+    {%- endif -%}
+  </a>
+  <h3><a href="{{ product.url | default: '#' }}">{{ product.title }}</a></h3>
+  {%- if rating and rating_count -%}
+    <div class="pl-rate"><b>★ {{ rating }}</b> · {{ 'sections.pl_shared.reviews_count' | t: count: rating_count }}</div>
+  {%- endif -%}
+  <div class="pl-pr">
+    {%- render 'pl-price', price: variant.price, compare_at_price: variant.compare_at_price -%}
+  </div>
+  {%- if product.available == false -%}
+    <button type="button" class="pl-btn pl-btn-ghost pl-btn-sm" disabled>{{ 'sections.pl_shared.sold_out' | t }}</button>
+  {%- elsif product.has_only_default_variant == false -%}
+    {%- comment -%} Card has no size/variant picker, so a product with real
+    variants can't add-to-cart blind — send them to the PDP to choose,
+    same pattern Dawn's own featured-collection card uses. {%- endcomment -%}
+    <a href="{{ product.url }}" class="pl-btn pl-btn-ghost pl-btn-sm">{{ 'products.product.choose_options' | t | default: 'Choose options' }}</a>
+  {%- else -%}
+    {%- form 'product', product, class: 'pl-card-form' -%}
+      <input type="hidden" name="id" value="{{ variant.id }}">
+      <button type="submit" class="pl-btn pl-btn-ghost pl-btn-sm" name="add">
+        {{- 'sections.pl_shared.add_to_cart' | t -}}
+      </button>
+    {%- endform -%}
+  {%- endif -%}
+</article>
