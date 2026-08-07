@@ -1,0 +1,35 @@
+{%- comment -%}
+  Renders price + compare-at + savings badge from real Shopify money values.
+  All prices are computed from price/compare_at_price at render time — never
+  hand-typed by a merchant — so the "33% off" / "Save ₹398" badges can never
+  drift out of sync with the actual price the way the static prototype's
+  copy could (every number in the source file was hand-typed text).
+
+  Params:
+    price:            required, in the shop's smallest currency unit (cents/paise)
+    compare_at_price:  optional, same unit. Badge and <s> only render if this
+                        is present AND greater than price.
+    badge_style: 'percent' (default, "33% off") | 'amount' ("Save ₹398")
+    size: 'card' (default) | 'combo' | 'tier'
+{%- endcomment -%}
+{%- liquid
+  assign badge_style = badge_style | default: 'percent'
+  assign has_compare = false
+  if compare_at_price and compare_at_price > price
+    assign has_compare = true
+    assign savings = compare_at_price | minus: price
+    assign pct_off = savings | times: 100 | divided_by: compare_at_price
+    assign savings_money = savings | money
+  endif
+-%}
+<strong>{{ price | money }}</strong>
+{%- if has_compare -%}
+  <s>{{ compare_at_price | money }}</s>
+  <em>
+    {%- if badge_style == 'amount' -%}
+      {{- 'sections.pl_shared.save_amount_html' | t: amount: savings_money -}}
+    {%- else -%}
+      {{- 'sections.pl_shared.percent_off_html' | t: percent: pct_off -}}
+    {%- endif -%}
+  </em>
+{%- endif -%}

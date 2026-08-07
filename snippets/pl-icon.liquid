@@ -1,0 +1,34 @@
+{%- comment -%}
+  Renders one of the source file's four hand-drawn icons.
+  Usage: {% render 'pl-icon', icon: 'leaf', class: 'pl-rule-icon' %}
+  icon: 'leaf' | 'shield' | 'sparkle' | 'check' | 'arrow'
+{%- endcomment -%}
+{%- liquid
+  assign icon = icon | default: 'leaf'
+  assign svg_class = class | default: ''
+-%}
+{%- case icon -%}
+  {%- when 'leaf' -%}
+    <svg class="{{ svg_class }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 21c0-6.5 3.5-11 8-12.5C20 15 16.5 20 12 21Z"/><path d="M12 21C12 14.5 8.5 10 4 8.5 4 15 7.5 20 12 21Z"/></svg>
+  {%- when 'shield' -%}
+    <svg class="{{ svg_class }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3 4.5 6v6.2c0 4.3 3.1 7.6 7.5 8.8 4.4-1.2 7.5-4.5 7.5-8.8V6L12 3Z"/><path d="m9 12 2.2 2.2L15.4 10"/></svg>
+  {%- when 'sparkle' -%}
+    <svg class="{{ svg_class }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.4"/><path d="M6.4 17.6 17.6 6.4"/></svg>
+  {%- when 'check' -%}
+    <svg class="{{ svg_class }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m5 13 4 4L19 7"/></svg>
+  {%- when 'arrow' -%}
+    <svg class="{{ svg_class }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h13m-5-6 6 6-6 6"/></svg>
+  {%- when 'swipe' -%}
+    <svg class="{{ svg_class }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h13m-5-6 6 6-6 6"/></svg>
+  {%- when 'bottle-placeholder' -%}
+    {%- comment -%} Generic bottle silhouette — the ONLY illustration carried over from the
+    source file's 12 hardcoded base64 SVGs. Used exclusively as the "no image"
+    product fallback so the shop grid never breaks; every other product uses
+    its real Shopify image. See NOTES.md. {%- endcomment -%}
+    <svg class="{{ svg_class }}" viewBox="0 0 130 200" aria-hidden="true" focusable="false">
+      <ellipse cx="65" cy="190" rx="40" ry="7" fill="currentColor" opacity=".12"/>
+      <path d="M40 60V48c0-7 5-12 12-12h13c8 0 13 6 13 13v11Z" fill="currentColor" opacity=".28"/>
+      <path d="M28 96c0-11 6-18 15-24v-8h33v8c9 6 15 13 15 24v62c0 12-8 20-21 20H49c-13 0-21-8-21-20Z" fill="currentColor" opacity=".18" stroke="currentColor" stroke-width="1.4" stroke-opacity=".4"/>
+      <rect x="31" y="112" width="66" height="60" rx="6" fill="currentColor" opacity=".32"/>
+    </svg>
+{%- endcase -%}
