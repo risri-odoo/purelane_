@@ -1,0 +1,29 @@
+{
+  "note": "Created once in Admin (Settings > Custom data > Products) or via metafieldDefinitionCreate. If a reviews app (Judge.me / Loox / Yotpo) is installed later, drop rating_value/review_count and point pl-product-card.liquid at that app's own metafield namespace instead — it already ships rating + count as product metafields, so no markup change is needed, only the two lines in pl-product-card.liquid that read the metafield.",
+  "metafieldDefinitions": [
+    {
+      "namespace": "custom",
+      "key": "badge_label",
+      "name": "Badge label",
+      "type": "single_line_text_field",
+      "ownerType": "PRODUCT",
+      "description": "Overlay pill text on the shop grid card, e.g. 'Best seller', 'New', 'Top rated'. Independent of inventory status — Sold out is derived automatically from availability and always takes priority over this."
+    },
+    {
+      "namespace": "custom",
+      "key": "rating_value",
+      "name": "Rating value",
+      "type": "number_decimal",
+      "ownerType": "PRODUCT",
+      "description": "e.g. 4.8. Fallback used only if no reviews-app rating metafield is present."
+    },
+    {
+      "namespace": "custom",
+      "key": "review_count",
+      "name": "Review count",
+      "type": "number_integer",
+      "ownerType": "PRODUCT",
+      "description": "e.g. 237. Fallback used only if no reviews-app metafield is present."
+    }
+  ]
+}

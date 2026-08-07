@@ -1,0 +1,27 @@
+These sections share one stylesheet and one script (fonts, buttons, glass
+surfaces, reveal-on-scroll, hero rotator). They must load exactly ONCE per
+page no matter how many of the 5 sections are on it — so they belong in
+layout/theme.liquid, not inside each section file. Putting a <script> tag
+inside a section file that can appear more than once on a page would
+double-run the hero rotator / reveal-observer every time it repeats.
+
+Add to layout/theme.liquid, inside <head>, near the other asset tags:
+
+  {{ 'purelane-sections.css' | asset_url | stylesheet_tag }}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+Add just before </body>:
+
+  <script src="{{ 'purelane-sections.js' | asset_url }}" defer></script>
+
+Notes:
+- Only the font weights actually used by these 5 sections are requested
+  (the source file pulled Outfit 500/600/700/800 and Inter 400/500/600/700;
+  grep across hero/shop/combos/bundles/reviews shows only Outfit 700/800
+  and Inter 400-700 are ever used, so two weights were dropped).
+- If Dawn's brand/typography settings already load a display font, prefer
+  wiring --pl-surface headings to that instead of pulling a second webfont
+  — two font families is the single biggest thing I'd revisit with more
+  time (see NOTES.md, Performance).
