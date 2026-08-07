@@ -1,0 +1,78 @@
+{%- comment -%}
+  Renders one "combo" tile. Price, compare-at and the Shop bundle link all
+  come from `bundle_product` — a real, purchasable Shopify product (created
+  as a standalone SKU, or via the Shopify Bundles app / a Combined Listing).
+  The 2-3 `item_products` are display-only: they supply the little product
+  photo + one-line blurb in the tray. Modelling it this way means the price
+  merchants see is guaranteed to match what actually gets charged at
+  checkout — the source file's combo prices were separate hand-typed
+  strings with no relationship to real product prices at all.
+
+  Params:
+    block: required, the section block of type 'combo'
+{%- endcomment -%}
+{%- liquid
+  assign bundle_product = block.settings.bundle_product
+  assign variant = bundle_product.selected_or_first_available_variant
+  assign flag = block.settings.flag
+  assign featured = false
+  if flag != 'none' and flag != blank
+    assign featured = true
+  endif
+-%}
+{%- if bundle_product != blank -%}
+<article class="pl-glass pl-combo pl-rv{% if featured %} pl-combo-featured{% endif %}" {{ block.shopify_attributes }}>
+  <div class="pl-tray">
+    {%- if variant.compare_at_price > variant.price -%}
+      {%- assign combo_savings = variant.compare_at_price | minus: variant.price -%}
+      {%- assign combo_savings_money = combo_savings | money -%}
+      <span class="pl-save">
+        {%- if block.settings.save_label != blank -%}
+          {{- block.settings.save_label -}}
+        {%- else -%}
+          {{- 'sections.pl_shared.save_amount_html' | t: amount: combo_savings_money -}}
+        {%- endif -%}
+      </span>
+    {%- endif -%}
+    {%- if flag == 'most_popular' -%}
+      <span class="pl-flag">Most popular</span>
+    {%- elsif flag == 'best_value' -%}
+      <span class="pl-flag">Best value</span>
+    {%- endif -%}
+    <div class="pl-stack">
+      {%- for i in (1..3) -%}
+        {%- assign item_key = 'item_product_' | append: i -%}
+        {%- assign blurb_key = 'item_blurb_' | append: i -%}
+        {%- assign item_product = block.settings[item_key] -%}
+        {%- assign item_blurb = block.settings[blurb_key] -%}
+        {%- if item_product != blank -%}
+          {%- if forloop.index > 1 -%}<span class="pl-plus" aria-hidden="true">+</span>{%- endif -%}
+          <span class="pl-it">
+            {%- if item_product.featured_image -%}
+              {{- item_product.featured_image | image_url: width: 160 | image_tag: loading: 'lazy', widths: '80,120,160', alt: '' -}}
+            {%- else -%}
+              {%- render 'pl-icon', icon: 'bottle-placeholder' -%}
+            {%- endif -%}
+            <span>{{ item_blurb | default: item_product.title }}</span>
+          </span>
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  </div>
+  <div class="pl-body">
+    <h3>{{ block.settings.title | default: bundle_product.title }}</h3>
+    <div class="pl-cnt">{{ block.settings.item_count | default: 3 }} products</div>
+    {%- if block.settings.description != blank -%}
+      <p class="pl-inc">{{ block.settings.description }}</p>
+    {%- endif -%}
+    <div class="pl-prow">
+      {%- render 'pl-price', price: variant.price, compare_at_price: variant.compare_at_price -%}
+    </div>
+    <div class="pl-fine">Inclusive of all taxes · COD available</div>
+    <a class="pl-btn {% if featured %}pl-btn-primary{% else %}pl-btn-ghost{% endif %}" href="{{ bundle_product.url }}">
+      {{ 'sections.pl_shared.shop_bundle' | t }}
+      {%- render 'pl-icon', icon: 'arrow' -%}
+    </a>
+  </div>
+</article>
+{%- endif -%}
