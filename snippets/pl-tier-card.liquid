@@ -1,0 +1,53 @@
+{%- comment -%}
+  Renders one "build your bundle" tier (Starter / Most popular / Whole home).
+  Price and compare-at come from `tier_product` — same reasoning as combos:
+  a real product a merchant maintains in one place (Shopify admin), not a
+  string duplicated across the storefront.
+{%- endcomment -%}
+{%- liquid
+  assign tier_product = block.settings.tier_product
+  assign variant = tier_product.selected_or_first_available_variant
+  assign featured = block.settings.featured
+  assign bullets = block.settings.bullets | newline_to_br | split: '<br />'
+-%}
+{%- if tier_product != blank -%}
+<article class="pl-glass pl-tier pl-rv{% if featured %} pl-tier-featured{% endif %}" {{ block.shopify_attributes }}>
+  {%- if block.settings.tag != blank -%}<span class="pl-tag">{{ block.settings.tag }}</span>{%- endif -%}
+  <div class="pl-tierpix{% if block.settings.product_count >= 5 %} pl-five{% endif %}" aria-hidden="true">
+    {%- for i in (1..5) -%}
+      {%- assign img_key = 'tray_product_' | append: i -%}
+      {%- assign tray_product = block.settings[img_key] -%}
+      {%- if tray_product != blank -%}
+        {%- if tray_product.featured_image -%}
+          {{- tray_product.featured_image | image_url: width: 120 | image_tag: loading: 'lazy', widths: '60,90,120', alt: '' -}}
+        {%- else -%}
+          {%- render 'pl-icon', icon: 'bottle-placeholder' -%}
+        {%- endif -%}
+      {%- endif -%}
+    {%- endfor -%}
+  </div>
+  <div class="pl-qty">{{ block.settings.product_count }}<small>Products</small></div>
+  <div class="pl-price">{%- render 'pl-price', price: variant.price, compare_at_price: variant.compare_at_price -%}</div>
+  {%- if variant.price and block.settings.product_count > 0 -%}
+    {%- assign per_product = variant.price | divided_by: block.settings.product_count -%}
+    <p class="pl-body-s" style="font-size:12px">Flat {{ per_product | money }} per product</p>
+  {%- endif -%}
+  {%- if bullets.size > 0 -%}
+    <ul>
+      {%- for bullet in bullets -%}
+        {%- if bullet != blank -%}
+          <li>{% render 'pl-icon', icon: 'check' %}{{ bullet }}</li>
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+  <a class="pl-btn {% if featured %}pl-btn-primary{% else %}pl-btn-ghost{% endif %}" href="{{ block.settings.cta_url | default: tier_product.url }}">
+    {%- if block.settings.cta_label != blank -%}
+      {{- block.settings.cta_label -}}
+    {%- else -%}
+      {{- 'sections.pl_shared.build_this_box' | t -}}
+    {%- endif -%}
+    {%- if featured -%}{% render 'pl-icon', icon: 'arrow' %}{%- endif -%}
+  </a>
+</article>
+{%- endif -%}
