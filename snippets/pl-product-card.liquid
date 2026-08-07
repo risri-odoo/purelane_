@@ -18,6 +18,7 @@
   assign rating = product.metafields.reviews.rating.value.rating | default: product.metafields.custom.rating_value.value
   assign rating_count = product.metafields.reviews.rating_count.value | default: product.metafields.custom.review_count.value
   assign card_image = product.featured_image
+  assign card_image_alt = card_image.alt | default: product.title
 -%}
 <article class="pl-glass pl-card pl-rv {{ card_class }}">
   <a href="{{ product.url | default: '#' }}" class="pl-shot{% if product.available == false %} pl-shot-soldout{% endif %}" aria-hidden="{% if card_image %}true{% else %}false{% endif %}" tabindex="-1">
@@ -31,7 +32,7 @@
         loading: 'lazy',
         widths: '160, 240, 320, 400',
         sizes: '(min-width: 1024px) 260px, (min-width: 700px) 30vw, 45vw',
-        alt: card_image.alt | default: product.title
+        alt: card_image_alt
       }}
     {%- else -%}
       {%- render 'pl-icon', icon: 'bottle-placeholder' -%}

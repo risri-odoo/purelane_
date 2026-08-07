@@ -65,10 +65,12 @@
         <div class="pl-hstage" data-pl-hstage data-interval="{{ section.settings.rotation_speed | times: 1000 }}">
           {%- for block in slide_blocks limit: 3 -%}
             <div class="pl-hslide{% if forloop.first %} pl-on{% endif %}" {{ block.shopify_attributes }}>
+              {%- assign slide_has_image = false -%}
               {%- for i in (1..3) -%}
                 {%- assign img_key = 'image_' | append: i -%}
                 {%- assign slide_image = block.settings[img_key] -%}
                 {%- if slide_image != blank -%}
+                  {%- assign slide_has_image = true -%}
                   {%- if i == 1 -%}
                     {%- assign img_class = 'pl-a' -%}
                   {%- elsif i == 2 -%}
@@ -78,24 +80,29 @@
                   {%- endif -%}
                   {%- assign eager = false -%}
                   {%- if forloop.parent.first and i == 1 -%}{%- assign eager = true -%}{%- endif -%}
+                  {%- assign img_full_class = 'pl-hp ' | append: img_class -%}
+                  {%- assign img_alt = block.settings.image_alt | default: block.settings.label -%}
                   {%- if eager -%}
                     {{- slide_image | image_url: width: 800 | image_tag:
-                      class: 'pl-hp ' | append: img_class,
+                      class: img_full_class,
                       widths: '300, 450, 600, 800',
                       sizes: '(min-width: 900px) 40vw, 80vw',
-                      alt: block.settings.image_alt | default: block.settings.label
+                      alt: img_alt
                     -}}
                   {%- else -%}
                     {{- slide_image | image_url: width: 800 | image_tag:
-                      class: 'pl-hp ' | append: img_class,
+                      class: img_full_class,
                       loading: 'lazy',
                       widths: '300, 450, 600, 800',
                       sizes: '(min-width: 900px) 40vw, 80vw',
-                      alt: block.settings.image_alt | default: block.settings.label
+                      alt: img_alt
                     -}}
                   {%- endif -%}
                 {%- endif -%}
               {%- endfor -%}
+              {%- unless slide_has_image -%}
+                {%- render 'pl-icon', icon: 'bottle-placeholder', class: 'pl-hp pl-a pl-hp-placeholder' -%}
+              {%- endunless -%}
               <div class="pl-glass-2 pl-ptag">
                 <span class="pl-lbl">{{ block.settings.label }}</span>
                 <span class="pl-val">

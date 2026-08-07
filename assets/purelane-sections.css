@@ -139,6 +139,7 @@
   filter:drop-shadow(0 24px 40px rgba(2,20,19,.28))}
 .pl-hp.pl-b{height:88%}
 .pl-hp.pl-c{height:76%}
+.pl-hp-placeholder{height:70%;color:rgba(250,247,253,.5)}
 .pl-ptag{position:absolute;left:0;bottom:2%;z-index:6;padding:11px 14px 12px;border-radius:16px;max-width:52%}
 .pl-ptag .pl-lbl{display:block;font-size:9px;font-weight:800;letter-spacing:.17em;text-transform:uppercase;color:var(--pl-accent)}
 .pl-ptag .pl-val{display:flex;align-items:baseline;gap:7px;margin-top:5px}
