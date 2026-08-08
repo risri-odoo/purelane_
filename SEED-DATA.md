@@ -97,15 +97,39 @@ box photography would replace this gap if/when available.
   design — see NOTES.md); shop grid pins all 8 shop-grid products
   including the 3 required edge cases; combos/tiers reference the 6
   backing products; reviews reference the 5 `review_card` metaobjects.
-- **Not verified live**: the storefront is password-protected and the
-  password provided didn't authenticate (checked via both `shopify
-  theme dev --store-password` and a direct POST to `/password`) — no
-  screenshot or rendered-HTML check has been done. The 3 edge cases were
-  traced through the Liquid/CSS instead (see `snippets/pl-product-card.liquid`
-  and `assets/purelane-sections.css`): sold-out sets `product.available
-  == false`, which shows a "Sold out" pill + disabled button and
-  correctly suppresses any `badge_label` override; no-image falls back
-  to the `bottle-placeholder` icon since `product.featured_image` is
-  blank; long-title is clamped to 2 lines via `-webkit-line-clamp:2` on
-  `.pl-card h3`. This is a code-level check, not a rendered one — still
-  needs an actual look once storefront access is sorted.
+- **Verified live** via full-page screenshots of the preview theme at
+  375px and 1440px against `purelane-homepage.html`. This surfaced 3 real
+  bugs that code review and `theme check` both missed:
+  1. All 14 seed products were never published to the Online Store sales
+     channel (`onlineStoreUrl: null` on every one) — the shop grid,
+     combos and bundles all rendered as empty shells. Fixed by running
+     `publishablePublish` on all 14 against the Online Store publication
+     (`gid://shopify/Publication/176783392828`).
+  2. `hero.liquid` and `pl-product-card.liquid` both had `alt: x |
+     default: y` as a named argument inside an `image_tag:` filter call —
+     a real Liquid runtime error (`wrong number of arguments`), not a
+     lint issue, that silently blanked every hero and shop-grid image.
+     See `AI-WORKFLOW.md` → "Where it failed me" for why Theme Check
+     didn't catch this one. Fixed by assigning the resolved alt text to a
+     variable first, same pattern as the step-4 `render`-tag fix.
+  3. The `metaobject` block setting's JSON-template value is the
+     metaobject's **handle**, not its GID — `"review": "gid://shopify/
+     Metaobject/..."` silently resolved to blank (reviews section showed
+     its empty state) where `"review": "some-review-handle"` renders
+     correctly. Fixed in `templates/index.json` (theme-side, not this
+     repo).
+  After those three fixes: hero, shop grid (all 8 cards including the 3
+  edge cases), combos, bundles and reviews all render correctly at both
+  breakpoints. Confirmed by eye, cropped in on the shop grid specifically:
+  sold-out shows a dark "Sold out" pill + dimmed image + disabled button;
+  no-image falls back cleanly to the `bottle-placeholder` icon;
+  long-title clamps to 2 lines with an ellipsis, no overflow.
+- **Not investigated further, intentionally**: the hero's dark-purple
+  background vs. the original's light mint gradient. That's not a bug —
+  it's the documented tradeoff in NOTES.md (the original's light
+  background comes from a page-level scroll-synced "scenes" system,
+  deliberately dropped as incompatible with reorderable sections; the
+  hero got its own self-contained gradient instead). Section order on
+  the homepage (shop → combos → bundles here vs. combos → bundles → ...
+  → shop in the original, which also has 8 more sections this build
+  doesn't implement) also wasn't matched — out of scope per NOTES.md.

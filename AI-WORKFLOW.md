@@ -33,6 +33,27 @@ Concretely, the delegation split was:
   by re-reading each snippet after generation rather than trusting the
   first pass; a Theme Check run against the actual repo would surface the
   rest.
+- **A filter piped onto a value inside another filter's named argument
+  throws at render time, and Theme Check doesn't catch it.** Both
+  `hero.liquid` and `pl-product-card.liquid` had `alt: card_image.alt |
+  default: product.title` (or the equivalent for the hero slide's alt
+  text) as one of several named arguments inside an `image_tag:` filter
+  call. That's a real Liquid error — `wrong number of arguments (given
+  3, expected 2)` — not a lint warning, and it doesn't crash the page;
+  Shopify just inlines the error text in place of the tag output and
+  moves on. The net effect was every hero image and every shop-grid
+  product image rendering blank, silently, on the actual storefront.
+  Theme Check has a rule for this general shape of mistake
+  (`UnsupportedFilterArguments`), which is exactly what caught the
+  similar bug in `shop-product-grid.liquid`'s `render` calls back in
+  step 4 — but that rule only inspects arguments passed to the `render`
+  tag. It doesn't walk into a filter's own keyword-argument list looking
+  for chained filters, so `image_tag: alt: x | default: y` sailed
+  through a clean Theme Check run undetected. This one was only found by
+  actually rendering the theme and looking at a screenshot — static
+  analysis, however good, isn't a substitute for a real render pass, and
+  the two rules that look similar (render-tag args vs. filter-call args)
+  are not actually the same check.
 - **Nested loop scoping** — `forloop.parent.first` inside a loop-within-a-
   loop is easy to get backwards on the first attempt (used it to try to
   mark only the very first image of the very first slide as eager-loaded).
